@@ -142,6 +142,10 @@ $$f(x) = \\int_{-\\infty}^\\infty \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi$$
 		images: this.state.images.filter(img => img[0] !== key)
 	});
 
+	handleUploadImage = (key, data) => this.setState({
+		images: [...this.state.images, [key, data]]
+	});
+
 	render() {
 		const { value, components, remarkPlugins, rehypePlugins, theme } = this.state;
 
@@ -152,7 +156,12 @@ $$f(x) = \\int_{-\\infty}^\\infty \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi$$
 				<ImageList images={this.state.images} handleDelete={this.handleDeleteImage} />
 			</div>
 			<div className="editor">
-				<Editor theme={theme} value={value} onChange={newValue => this.handleChange(newValue)} />
+				<Editor
+					theme={theme}
+					value={value}
+					onChange={newValue => this.handleChange(newValue)}
+					onUploadImage={this.handleUploadImage}
+				/>
 			</div>
 			<div id="result" className="result">
 				<ReactMarkdown
