@@ -25,6 +25,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import ReactMarkdown from 'react-markdown';
 import Editor from './components/Editor';
 import ThemeSelect from './components/ThemeSelect';
+import ImageList from './components/ImageList';
+import { myLocalStorage } from './storageHelper';
 
 class App extends Component {
 
@@ -107,12 +109,17 @@ $$f(x) = \\int_{-\\infty}^\\infty \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi$$
 				)
 			}
 		},
-		theme: "monokai"
+		theme: "monokai",
+		images: [],
 	}
 
 	componentDidMount() {
 		const theme = window.localStorage.getItem("theme");
-		this.setState({ theme })
+		this.setState({ theme });
+
+		const imgKeys = myLocalStorage.keys().filter(k => k.startsWith("img/"));
+		const images = imgKeys.map(k => [k, myLocalStorage.getItem(k)]);
+		this.setState({ images });
 	}
 
 	handleChange(newValue) {
@@ -131,6 +138,10 @@ $$f(x) = \\int_{-\\infty}^\\infty \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi$$
 		this.setState({ theme })
 	}
 
+	handleDeleteImage = key => this.setState({
+		images: this.state.images.filter(img => img[0] !== key)
+	});
+
 	render() {
 		const { value, components, remarkPlugins, rehypePlugins, theme } = this.state;
 
@@ -138,6 +149,7 @@ $$f(x) = \\int_{-\\infty}^\\infty \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi$$
 			<div className="header">
 				<button onClick={() => this.save()} className="btn btn-primary">Save</button>
 				<ThemeSelect value={theme} changeTheme={theme => this.changeTheme(theme)} />
+				<ImageList images={this.state.images} handleDelete={this.handleDeleteImage} />
 			</div>
 			<div className="editor">
 				<Editor theme={theme} value={value} onChange={newValue => this.handleChange(newValue)} />

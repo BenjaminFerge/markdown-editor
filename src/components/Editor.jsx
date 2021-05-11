@@ -1,29 +1,30 @@
 import Codemirror from "@uiw/react-codemirror";
-import { Component } from "react";
+import React, { useCallback } from "react";
 import 'codemirror/keymap/sublime';
+import { useDropzone } from "react-dropzone";
+import { saveImage } from "../fileService";
 
-class Editor extends Component {
+export default function Editor({ value, theme, onChange }) {
+	const onDrop = useCallback(files => {
+		saveImage(files[0]);
+	}, [])
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
-	handleChange(editor, change) {
-		const { value, onChange } = this.props
-		const newValue = editor.getValue();
-		if (newValue !== value)
-			onChange(newValue);
-	}
-
-	render() {
-		const { value, theme } = this.props;
-
-		return <Codemirror
-			value={value}
-			onChange={(editor, change) => this.handleChange(editor, change)}
-			options={{
-				theme: theme,
-				keyMap: "sublime",
-				mode: "markdown",
-			}}
-		/>
-	}
+	const handleChange = (editor, _) =>
+		onChange(editor.getValue());
+	
+	return <>
+		<div {...getRootProps()}>
+			<input {...getInputProps()} />
+			<Codemirror
+				value={value}
+				onChange={(editor, change) => handleChange(editor, change)}
+				options={{
+					theme,
+					keyMap: "sublime",
+					mode: "markdown",
+				}}
+			/>
+		</div>
+	</>;
 }
-
-export default Editor;
