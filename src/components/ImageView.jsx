@@ -1,18 +1,26 @@
 import React from "react";
-import { myLocalStorage } from "../storageHelper";
+import { useDrag } from "react-dnd";
 import "./ImageView.css";
 
-export default function ImageView({ onDelete, image }) {
-    const [key, imageData] = image;
+export default function ImageView({ onDelete, image, isDragging }) {
+    const [{ opacity }, dragRef] = useDrag(
+        () => ({
+            type: "ImageView",
+            item: { text: "" },
+            collect: (monitor) => ({
+                opacity: monitor.isDragging() ? 0.5 : 1
+            })
+        }),
+        []
+    );
     return (
-        <div className="ImageView">
+        <div className="ImageView" ref={dragRef} style={{ opacity }}>
             <button onClick={() => {
                 if (window.confirm("Are you sure?")) {
-                    myLocalStorage.removeItem(key);
-                    onDelete(key);
+                    onDelete(image);
                 }
             }} className="ImageView-delete">x</button>
-            <img src={imageData} alt={key} />
+            <img src={image} alt="Embedded image" />
         </div>
     );
 }

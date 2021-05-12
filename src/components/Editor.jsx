@@ -2,30 +2,31 @@ import Codemirror from "@uiw/react-codemirror";
 import React, { useCallback } from "react";
 import 'codemirror/keymap/sublime';
 import { useDropzone } from "react-dropzone";
-import { saveImage } from "../fileService";
+import fileService from "../services/fileService";
 import { myLocalStorage } from "../storageHelper";
-
-const imgPrefix = "img/";
+import { useDrop } from "react-dnd";
 
 export default function Editor({ value, theme, onChange, onUploadImage }) {
 	const onDrop = useCallback(files => {
-		const file = files[0];
-		saveImage(file, (err, data) => {
-			if (err) {
-				throw new Error(err);
-			}
-			const key = imgPrefix + file.name;
-			myLocalStorage.store(key, data);
-			onUploadImage(key, data);
-		});
+		fileService.saveImage(files)
+			.then(res => res.json())
+			.then(res => {
+				const { path: filename } = res.files[0];
+				const path = `${fileService.getUrl()}/${filename}`;
+				onUploadImage(path);
+			});
 	}, [])
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
 	const handleChange = (editor, _) =>
 		onChange(editor.getValue());
 
+	const [collectedProps, drop] = useDrop(() => ({
+		accept: ["ImageView"]
+	}))
+
 	return <>
-		<div {...getRootProps()}>
+		<div {...getRootProps()} ref={drop}>
 			<input {...getInputProps()} />
 			<Codemirror
 				value={value}
