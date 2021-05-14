@@ -1,5 +1,6 @@
 import React from "react";
 import { useDrag } from "react-dnd";
+import fileService from "../services/fileService";
 import "./ImageView.css";
 
 export default function ImageView({ onDelete, image, isDragging }) {
@@ -20,7 +21,7 @@ export default function ImageView({ onDelete, image, isDragging }) {
                     onDelete(image);
                 }
             }} className="ImageView-delete">x</button>
-            <img src={image} alt="Embedded image" />
+            <img src={`${fileService.getUrl()}/${image}`} alt="Embedded image" />
         </div>
     );
 }

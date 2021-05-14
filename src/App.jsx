@@ -27,6 +27,7 @@ import Editor from './components/Editor';
 import ThemeSelect from './components/ThemeSelect';
 import ImageList from './components/ImageList';
 import { myLocalStorage } from './storageHelper';
+import fileService from './services/fileService';
 
 class App extends Component {
 
@@ -170,11 +171,16 @@ $$f(x) = \\int_{-\\infty}^\\infty \\hat f(\\xi)\\,e^{2 \\pi i \\xi x} \\,d\\xi$$
 			</div>
 			<div id="result" className="result">
 				<ReactMarkdown
+					transformImageUri={input =>
+						/^https?:/.test(input)
+							? input
+							: `${fileService.getUrl()}/${input}`}
 					className="markdown-body"
 					components={components}
 					remarkPlugins={remarkPlugins}
 					rehypePlugins={rehypePlugins}
 					children={value}
+
 				/>
 			</div>
 		</>
